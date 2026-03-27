@@ -1,0 +1,103 @@
+<div class="min-h-screen flex bg-gray-50">
+  @if (sidebarOpen()) {
+    <div 
+      class="fixed inset-0 bg-black/40 z-40 md:hidden backdrop-blur-sm"
+      (click)="closeSidebar()"
+    ></div>
+  }
+
+  <div 
+    class="fixed inset-y-0 left-0 z-50 w-56 transform transition-transform duration-200 ease-out md:hidden"
+    [class.translate-x-0]="sidebarOpen()"
+    [class.-translate-x-full]="!sidebarOpen()"
+  >
+    <app-sidebar (closeSidebar)="closeSidebar()"></app-sidebar>
+  </div>
+
+  <app-sidebar class="hidden md:flex"></app-sidebar>
+  
+  <main class="flex-1 flex flex-col min-w-0">
+    <header class="bg-white border-b border-gray-100 px-3 py-2.5 md:px-5 md:py-3">
+      <div class="flex items-center justify-between gap-3">
+        <button 
+          (click)="toggleSidebar()"
+          class="md:hidden p-1.5 text-gray-500 hover:bg-gray-100 rounded-md"
+        >
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+        
+        <div class="flex-1 max-w-xl">
+          <div class="relative">
+            <svg class="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            <input 
+              type="text" 
+              placeholder="Search"
+              class="w-full pl-9 pr-3 py-1.5 text-sm bg-gray-50 border-transparent rounded-md focus:bg-white focus:border-green-600 focus:ring-1 focus:ring-green-200 focus:outline-none transition-all"
+            />
+          </div>
+        </div>
+        
+        <div class="flex items-center gap-1.5">
+          <button class="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md">
+            <svg class="w-4 h-4 md:w-4.5 md:h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <div class="flex-1 p-3 md:p-5 overflow-auto">
+      <div class="mb-3 md:mb-5">
+        <h1 class="text-lg md:text-xl font-medium text-gray-700">Recent</h1>
+        <p class="text-gray-400 mt-0.5 text-xs md:text-sm">View your recently accessed files</p>
+      </div>
+
+      @if (recentItems().length === 0) {
+        <div class="flex items-start">
+          <div class="bg-white rounded-md shadow-sm border border-gray-100 p-5 md:p-6 text-center flex-1">
+            <div class="w-12 h-12 md:w-14 md:h-14 mx-auto mb-3 bg-green-50 rounded-full flex items-center justify-center">
+              <svg class="w-6 h-6 md:w-7 md:h-7 text-green-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <h3 class="text-sm md:text-base font-medium text-gray-600 mb-1.5">No recent files</h3>
+            <p class="text-gray-400 mb-3 text-xs md:text-sm">Files you access will appear here</p>
+          </div>
+        </div>
+      } @else {
+        <div class="bg-white rounded-md shadow-sm border border-gray-100 overflow-hidden">
+          <table class="w-full">
+            <thead class="bg-gray-50 border-b border-gray-100">
+              <tr>
+                <th class="text-left px-4 py-2.5 text-xs font-medium text-gray-500 uppercase">Name</th>
+                <th class="text-right px-4 py-2.5 text-xs font-medium text-gray-500 uppercase">Accessed</th>
+                <th class="text-right px-4 py-2.5 text-xs font-medium text-gray-500 uppercase">Size</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-50">
+              @for (item of recentItems(); track item.name + item.accessedAt) {
+                <tr class="hover:bg-gray-50">
+                  <td class="px-4 py-2.5 text-sm text-gray-700">
+                    <div class="flex items-center gap-2">
+                      <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                      </svg>
+                      <span>{{ item.name }}</span>
+                    </div>
+                  </td>
+                  <td class="px-4 py-2.5 text-sm text-gray-500 text-right">{{ item.accessedAt | date:'short' }}</td>
+                  <td class="px-4 py-2.5 text-sm text-gray-500 text-right">{{ item.size }} bytes</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+  </main>
+</div>

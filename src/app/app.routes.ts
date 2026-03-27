@@ -16,6 +16,31 @@ export const routes: Routes = [
     canActivate: [guestGuard]
   },
   { 
+    path: 'recent', 
+    loadComponent: () => import('./components/recent/recent.component').then(m => m.RecentComponent),
+    canActivate: [authGuard]
+  },
+  { 
+    path: 'starred', 
+    loadComponent: () => import('./components/home/home.component').then(m => m.HomeComponent),
+    canActivate: [authGuard]
+  },
+  { 
+    path: 'trash', 
+    loadComponent: () => import('./components/trash/trash.component').then(m => m.TrashComponent),
+    canActivate: [authGuard]
+  },
+  { 
+    path: 'my-drive', 
+    loadComponent: () => import('./components/my-drive/my-drive.component').then(m => m.MyDriveComponent),
+    canActivate: [authGuard]
+  },
+  { 
+    path: 'folder/:folderName', 
+    loadComponent: () => import('./components/home/home.component').then(m => m.HomeComponent),
+    canActivate: [authGuard]
+  },
+  { 
     path: '', 
     loadComponent: () => import('./components/home/home.component').then(m => m.HomeComponent),
     canActivate: [authGuard]

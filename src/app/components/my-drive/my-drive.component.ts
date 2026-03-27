@@ -1,6 +1,5 @@
 import { Component, inject, signal, ViewChild, ElementRef, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
 import { SidebarComponent } from '../sidebar/sidebar.component';
 import { ConfirmModalComponent } from '../confirm-modal/confirm-modal.component';
 import { AuthService } from '../../services/auth.service';
@@ -9,16 +8,15 @@ import { NotificationService } from '../../services/notification.service';
 import { FolderResponse } from '../../models/folderResponse';
 
 @Component({
-  selector: 'app-home',
+  selector: 'app-my-drive',
   standalone: true,
   imports: [CommonModule, SidebarComponent, ConfirmModalComponent],
-  templateUrl: './home.component.html',
-  styleUrl: './home.component.css'
+  templateUrl: './my-drive.component.html',
+  styleUrl: './my-drive.component.css'
 })
-export class HomeComponent implements OnInit {
+export class MyDriveComponent implements OnInit {
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
 
-  private route = inject(ActivatedRoute);
   authService = inject(AuthService);
   fileService = inject(FileService);
   notificationService = inject(NotificationService);
@@ -26,22 +24,17 @@ export class HomeComponent implements OnInit {
   user = this.authService.getUser();
   sidebarOpen = signal(false);
   files = signal<FolderResponse[]>([]);
+  loading = signal(false);
   uploading = signal(false);
-  loading = signal(true);
-  currentFolder = signal<string | null>(null);
   fileToDelete = signal<string | null>(null);
 
   ngOnInit(): void {
-    this.route.paramMap.subscribe(params => {
-      const folderName = params.get('folderName');
-      this.currentFolder.set(folderName);
-      this.loadFiles(folderName);
-    });
+    this.loadFiles();
   }
 
-  loadFiles(folderName: string | null): void {
+  loadFiles(): void {
     this.loading.set(true);
-    this.fileService.listRoot(folderName || '').subscribe({
+    this.fileService.listRoot('').subscribe({
       next: (response) => {
         this.files.set(response);
         this.loading.set(false);
@@ -75,10 +68,10 @@ export class HomeComponent implements OnInit {
 
   uploadFile(file: File): void {
     this.uploading.set(true);
-    this.fileService.uploadFile(file, this.currentFolder()).subscribe({
+    this.fileService.uploadFile(file, null).subscribe({
       next: () => {
         this.notificationService.success('File uploaded successfully');
-        this.loadFiles(this.currentFolder());
+        this.loadFiles();
         this.uploading.set(false);
       },
       error: (error) => {
@@ -99,7 +92,7 @@ export class HomeComponent implements OnInit {
     this.fileService.deleteFile(fileName).subscribe({
       next: () => {
         this.notificationService.success('File deleted successfully');
-        this.loadFiles(this.currentFolder());
+        this.loadFiles();
       },
       error: () => {
         this.notificationService.error('Failed to delete file');

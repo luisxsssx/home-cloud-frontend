@@ -30,8 +30,16 @@ export class FileService {
     return this.http.post<FileResponse>(`${this.apiUrl}/upload`, formData);
   }
 
-  listRoot(folderName: string | null): Observable<FolderResponse[]> {
-    const data = { folder_name: folderName };
-    return this.http.post<FolderResponse[]>(`${this.apiUrl}/list`, data);
+  listRoot(folder_name: string): Observable<any> {
+    const data = { folder_name };
+    return this.http.post<any>(`${this.apiUrl}/list`, data);
+  }
+
+  deleteFile(fileName: string): Observable<any> {
+    return this.http.delete<any>(`${this.apiUrl}/delete`, { body: { file_name: fileName } });
+  }
+
+  deleteFolder(folderName: string): Observable<any> {
+    return this.http.post<any>(`${environment.apiUrl}/cloud/delete/folder`, { folder_name: folderName });
   }
 }
