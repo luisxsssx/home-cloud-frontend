@@ -26,10 +26,14 @@ export class HomeComponent implements OnInit {
   user = this.authService.getUser();
   sidebarOpen = signal(false);
   files = signal<FolderResponse[]>([]);
+  allFiles = signal<FolderResponse[]>([]);
   uploading = signal(false);
   loading = signal(true);
   currentFolder = signal<string | null>(null);
-  fileToDelete = signal<string | null>(null);
+  searchQuery = signal('');
+  itemToDelete = signal<{name: string; type: 'file' | 'folder'} | null>(null);
+  itemToRename = signal<{name: string; type: 'file' | 'folder'} | null>(null);
+  showCreateFolderModal = signal(false);
 
   ngOnInit(): void {
     this.route.paramMap.subscribe(params => {
@@ -43,7 +47,8 @@ export class HomeComponent implements OnInit {
     this.loading.set(true);
     this.fileService.listRoot(folderName || '').subscribe({
       next: (response) => {
-        this.files.set(response);
+        this.allFiles.set(response);
+        this.applySearch();
         this.loading.set(false);
       },
       error: (error) => {
@@ -51,6 +56,30 @@ export class HomeComponent implements OnInit {
         this.loading.set(false);
       }
     });
+  }
+
+  applySearch(): void {
+    const query = this.searchQuery().toLowerCase().trim();
+    if (!query) {
+      this.files.set(this.allFiles());
+    } else {
+      this.files.set(
+        this.allFiles().filter(file => 
+          file.name.toLowerCase().includes(query)
+        )
+      );
+    }
+  }
+
+  onSearchChange(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    this.searchQuery.set(input.value);
+    this.applySearch();
+  }
+
+  clearSearch(): void {
+    this.searchQuery.set('');
+    this.applySearch();
   }
 
   toggleSidebar(): void {
@@ -88,27 +117,94 @@ export class HomeComponent implements OnInit {
     });
   }
 
-  deleteFile(fileName: string): void {
-    this.fileToDelete.set(fileName);
+  deleteItem(file: FolderResponse): void {
+    const type = file.name.endsWith('/') ? 'folder' : 'file';
+    this.itemToDelete.set({ name: file.name, type });
   }
 
   confirmDelete(): void {
-    const fileName = this.fileToDelete();
-    if (!fileName) return;
+    const item = this.itemToDelete();
+    if (!item) return;
 
-    this.fileService.deleteFile(fileName).subscribe({
+    const deleteCall = item.type === 'folder'
+      ? this.fileService.deleteFolder(item.name)
+      : this.fileService.deleteFile(item.name);
+
+    deleteCall.subscribe({
       next: () => {
-        this.notificationService.success('File deleted successfully');
+        this.notificationService.success(`${item.type === 'folder' ? 'Folder' : 'File'} deleted successfully`);
         this.loadFiles(this.currentFolder());
       },
       error: () => {
-        this.notificationService.error('Failed to delete file');
+        this.notificationService.error(`Failed to delete ${item.type}`);
       }
     });
-    this.fileToDelete.set(null);
+    this.itemToDelete.set(null);
   }
 
   cancelDelete(): void {
-    this.fileToDelete.set(null);
+    this.itemToDelete.set(null);
+  }
+
+  renameItem(file: FolderResponse): void {
+    const type = file.name.endsWith('/') ? 'folder' : 'file';
+    this.itemToRename.set({ name: file.name, type });
+  }
+
+  confirmRename(newName: string | void): void {
+    const item = this.itemToRename();
+    if (!item || !newName || !newName.trim()) {
+      this.itemToRename.set(null);
+      return;
+    }
+
+    const trimmedName = newName.trim();
+    const request = {
+      old_file_name: item.name,
+      new_file_name: trimmedName,
+      itemType: (item.type === 'folder' ? 'FOLDER' : 'FILE') as 'FOLDER' | 'FILE'
+    };
+
+    this.fileService.renameItem(request).subscribe({
+      next: () => {
+        this.notificationService.success(`${item.type === 'folder' ? 'Folder' : 'File'} renamed successfully`);
+        this.loadFiles(this.currentFolder());
+      },
+      error: () => {
+        this.notificationService.error(`Failed to rename ${item.type}`);
+      }
+    });
+    this.itemToRename.set(null);
+  }
+
+  cancelRename(): void {
+    this.itemToRename.set(null);
+  }
+
+  openCreateFolderModal(): void {
+    this.showCreateFolderModal.set(true);
+  }
+
+  confirmCreateFolder(folderName: string | void): void {
+    if (!folderName || !folderName.trim()) {
+      this.showCreateFolderModal.set(false);
+      return;
+    }
+
+    const name = folderName.trim();
+    this.fileService.createFolder(name).subscribe({
+      next: () => {
+        this.notificationService.success('Folder created successfully');
+        this.loadFiles(this.currentFolder());
+      },
+      error: () => {
+        this.notificationService.error('Failed to create folder');
+      }
+    });
+    this.showCreateFolderModal.set(false);
+  }
+
+  cancelCreateFolder(): void {
+    this.showCreateFolderModal.set(false);
   }
 }
