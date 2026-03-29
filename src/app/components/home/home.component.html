@@ -1,5 +1,4 @@
 <div class="min-h-screen flex bg-gray-50">
-  <!-- Mobile sidebar backdrop -->
   @if (sidebarOpen()) {
     <div 
       class="fixed inset-0 bg-black/40 z-40 md:hidden backdrop-blur-sm"
@@ -7,7 +6,6 @@
     ></div>
   }
 
-  <!-- Mobile sidebar -->
   <div 
     class="fixed inset-y-0 left-0 z-50 w-56 transform transition-transform duration-200 ease-out md:hidden"
     [class.translate-x-0]="sidebarOpen()"
@@ -16,14 +14,11 @@
     <app-sidebar (closeSidebar)="closeSidebar()"></app-sidebar>
   </div>
 
-  <!-- Desktop sidebar -->
   <app-sidebar class="hidden md:flex"></app-sidebar>
   
   <main class="flex-1 flex flex-col min-w-0">
-    <!-- Mobile header with hamburger -->
     <header class="bg-white border-b border-gray-100 px-3 py-2.5 md:px-5 md:py-3">
       <div class="flex items-center justify-between gap-3">
-        <!-- Mobile menu button -->
         <button 
           (click)="toggleSidebar()"
           class="md:hidden p-1.5 text-gray-500 hover:bg-gray-100 rounded-md"
@@ -40,208 +35,81 @@
             </svg>
             <input 
               type="text" 
-              placeholder="Search files..."
-              [value]="searchQuery()"
-              (input)="onSearchChange($event)"
-              class="w-full pl-9 pr-8 py-1.5 text-sm bg-gray-50 border-transparent rounded-md focus:bg-white focus:border-green-600 focus:ring-1 focus:ring-green-200 focus:outline-none transition-all"
+              placeholder="Search"
+              class="w-full pl-9 pr-3 py-1.5 text-sm bg-gray-50 border-transparent rounded-md focus:bg-white focus:border-green-600 focus:ring-1 focus:ring-green-200 focus:outline-none transition-all"
             />
-            @if (searchQuery()) {
-              <button 
-                (click)="clearSearch()"
-                class="absolute right-2.5 top-1/2 -translate-y-1/2 p-0.5 text-gray-400 hover:text-gray-600"
-              >
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            }
           </div>
-        </div>
-        
-        <div class="flex items-center gap-1.5">
-          <button 
-            (click)="openCreateFolderModal()"
-            class="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md"
-            title="New folder"
-          >
-            <svg class="w-4 h-4 md:w-4.5 md:h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
-            </svg>
-          </button>
         </div>
       </div>
     </header>
 
     <div class="flex-1 p-3 md:p-5 overflow-auto">
-      <div class="mb-3 md:mb-5 flex items-center justify-between">
-        <div>
-          <h1 class="text-lg md:text-xl font-medium text-gray-700">My Files</h1>
-          <p class="text-gray-400 mt-0.5 text-xs md:text-sm">Welcome back, {{ user?.username }}</p>
-        </div>
-        @if (searchQuery()) {
-          <span class="text-xs text-gray-400">{{ files().length }} result{{ files().length === 1 ? '' : 's' }}</span>
-        }
+      <div class="mb-6">
+        <h1 class="text-xl md:text-2xl font-medium text-gray-700">Welcome, {{ user?.username }}</h1>
+        <p class="text-gray-400 mt-1 text-sm">Access your files anytime, anywhere</p>
       </div>
 
-      @if (loading()) {
-        <div class="flex items-start">
-          <div class="bg-white rounded-md shadow-sm border border-gray-100 p-5 md:p-6 text-center flex-1">
-            <div class="flex justify-center mb-3">
-              <div class="w-6 h-6 border-2 border-green-700 border-t-transparent rounded-full animate-spin"></div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div class="bg-white rounded-md shadow-sm border border-gray-100 p-4">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+              <svg class="w-5 h-5 text-green-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+              </svg>
             </div>
-            <p class="text-gray-400 text-xs md:text-sm">Loading...</p>
-          </div>
-        </div>
-      } @else if (files().length === 0) {
-        <div class="flex items-start">
-          <div class="bg-white rounded-md shadow-sm border border-gray-100 p-5 md:p-6 text-center flex-1">
-            <div class="w-12 h-12 md:w-14 md:h-14 mx-auto mb-3 bg-green-50 rounded-full flex items-center justify-center">
-              @if (searchQuery()) {
-                <svg class="w-6 h-6 md:w-7 md:h-7 text-green-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-              } @else {
-                <svg class="w-6 h-6 md:w-7 md:h-7 text-green-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
-                </svg>
-              }
+            <div>
+              <p class="text-xs text-gray-400">Total Files</p>
+              <p class="text-lg font-medium text-gray-700">-</p>
             </div>
-            @if (searchQuery()) {
-              <h3 class="text-sm md:text-base font-medium text-gray-600 mb-1.5">No results found</h3>
-              <p class="text-gray-400 mb-3 text-xs md:text-sm">No files match "{{ searchQuery() }}"</p>
-            } @else {
-              <h3 class="text-sm md:text-base font-medium text-gray-600 mb-1.5">No files yet</h3>
-              <p class="text-gray-400 mb-3 text-xs md:text-sm">Upload your first file to get started</p>
-            }
-          </div>
-          <div class="ml-4 p-4">
-            <input 
-              #fileInput
-              type="file" 
-              class="hidden" 
-              (change)="onFileSelected($event)"
-            />
-            <button 
-              (click)="triggerFileInput()"
-              [disabled]="uploading()"
-              class="px-3.5 py-1.5 bg-green-700 text-white text-xs rounded-md hover:bg-green-800 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
-            >
-              @if (uploading()) {
-                Uploading...
-              } @else {
-                Upload
-              }
-            </button>
           </div>
         </div>
-      } @else {
-        <div class="bg-white rounded-md shadow-sm border border-gray-100 overflow-hidden">
-          <table class="w-full">
-            <thead class="bg-gray-50 border-b border-gray-100">
-              <tr>
-                <th class="text-left px-4 py-2.5 text-xs font-medium text-gray-500 uppercase">Name</th>
-                <th class="text-right px-4 py-2.5 text-xs font-medium text-gray-500 uppercase">Size</th>
-                <th class="text-right px-4 py-2.5 text-xs font-medium text-gray-500 uppercase">Actions</th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-50">
-              @for (file of files(); track file.name) {
-                <tr class="hover:bg-gray-50">
-                  <td class="px-4 py-2.5 text-sm text-gray-700">
-                    <div class="flex items-center gap-2">
-                      @if (file.name.endsWith('/')) {
-                        <svg class="w-4 h-4 text-yellow-500" fill="currentColor" viewBox="0 0 24 24">
-                          <path d="M10 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/>
-                        </svg>
-                      } @else {
-                        <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
-                        </svg>
-                      }
-                      <span>{{ file.name }}</span>
-                    </div>
-                  </td>
-                  <td class="px-4 py-2.5 text-sm text-gray-500 text-right">{{ file.size }} bytes</td>
-                  <td class="px-4 py-2.5 text-right">
-                    <button 
-                      (click)="renameItem(file); $event.stopPropagation()"
-                      class="p-1 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
-                      title="Rename"
-                    >
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                      </svg>
-                    </button>
-                    <button 
-                      (click)="deleteItem(file); $event.stopPropagation()"
-                      class="p-1 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
-                      title="Delete"
-                    >
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                      </svg>
-                    </button>
-                  </td>
-                </tr>
-              }
-            </tbody>
-          </table>
-          <div class="px-4 py-3 bg-gray-50 border-t border-gray-100">
-            <input 
-              #fileInput
-              type="file" 
-              class="hidden" 
-              (change)="onFileSelected($event)"
-            />
-            <button 
-              (click)="triggerFileInput()"
-              [disabled]="uploading()"
-              class="text-xs text-green-700 hover:text-green-800 font-medium disabled:opacity-50"
-            >
-              @if (uploading()) {
-                Uploading...
-              } @else {
-                Upload more files
-              }
-            </button>
+
+        <div class="bg-white rounded-md shadow-sm border border-gray-100 p-4">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center">
+              <svg class="w-5 h-5 text-yellow-600" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M10 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/>
+              </svg>
+            </div>
+            <div>
+              <p class="text-xs text-gray-400">Folders</p>
+              <p class="text-lg font-medium text-gray-700">-</p>
+            </div>
           </div>
         </div>
-      }
+
+        <div class="bg-white rounded-md shadow-sm border border-gray-100 p-4">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+              <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <div>
+              <p class="text-xs text-gray-400">Recent Activity</p>
+              <p class="text-lg font-medium text-gray-700">-</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-md shadow-sm border border-gray-100 p-5">
+        <h2 class="text-base font-medium text-gray-700 mb-3">Quick Actions</h2>
+        <div class="flex flex-wrap gap-3">
+          <div class="flex items-center gap-2 px-3 py-2 bg-gray-50 rounded-md">
+            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+            </svg>
+            <span class="text-sm text-gray-600">Upload files from My Drive</span>
+          </div>
+          <div class="flex items-center gap-2 px-3 py-2 bg-gray-50 rounded-md">
+            <svg class="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M10 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/>
+            </svg>
+            <span class="text-sm text-gray-600">Create folder from My Drive</span>
+          </div>
+        </div>
+      </div>
     </div>
   </main>
 </div>
-
-@if (itemToDelete()) {
-  <app-confirm-modal
-    [title]="'Delete ' + (itemToDelete()!.type === 'folder' ? 'folder' : 'file')"
-    [message]="'Are you sure you want to delete \'' + itemToDelete()!.name + '\'?'"
-    confirmText="Delete"
-    (confirm)="confirmDelete()"
-    (cancel)="cancelDelete()"
-  ></app-confirm-modal>
-}
-
-@if (itemToRename()) {
-  <app-confirm-modal
-    [title]="'Rename ' + (itemToRename()!.type === 'folder' ? 'folder' : 'file')"
-    [message]="'Enter a new name for this ' + itemToRename()!.type"
-    confirmText="Rename"
-    [showInput]="true"
-    [inputValue]="itemToRename()!.name"
-    [inputPlaceholder]="'New name'"
-    (confirm)="confirmRename($event)"
-    (cancel)="cancelRename()"
-  ></app-confirm-modal>
-}
-
-@if (showCreateFolderModal()) {
-  <app-confirm-modal
-    title="Create new folder"
-    message="Enter a name for the new folder"
-    confirmText="Create"
-    [showInput]="true"
-    [inputPlaceholder]="'Folder name'"
-    (confirm)="confirmCreateFolder($event)"
-    (cancel)="cancelCreateFolder()"
-  ></app-confirm-modal>
-}

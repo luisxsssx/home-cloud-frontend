@@ -25,6 +25,43 @@
     </div>
   </div>
 
+  <div class="px-3.5 py-2">
+    <div class="relative">
+      <button 
+        (click)="toggleAddMenu($event)"
+        class="w-full flex items-center gap-2 px-3 py-1.5 text-gray-600 bg-gray-50 hover:bg-gray-100 rounded-md transition-colors text-sm"
+      >
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+        </svg>
+        <span class="text-xs font-medium">New</span>
+      </button>
+      
+      @if (showAddMenu()) {
+        <div class="absolute left-3 right-3 mt-1 bg-white border border-gray-100 rounded-md shadow-md z-10">
+          <button 
+            (click)="folderCreateRequested.emit(); closeAddMenu()"
+            class="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+          >
+            <svg class="w-4 h-4 text-yellow-500" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M10 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/>
+            </svg>
+            New folder
+          </button>
+          <button 
+            (click)="addMenuOpen.emit(); closeAddMenu()"
+            class="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+          >
+            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+            </svg>
+            File upload
+          </button>
+        </div>
+      }
+    </div>
+  </div>
+
   <nav class="flex-1 p-2.5 overflow-y-auto">
     <ul class="space-y-0.5">
       <li>
@@ -39,9 +76,7 @@
       </li>
 
       <li class="relative">
-        <div 
-          (click)="onMyDriveClick($event)"
-          class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer"
+        <div class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer"
           [class.bg-green-50]="myDriveExpanded()"
           [class.text-green-800]="myDriveExpanded()"
         >
@@ -59,38 +94,31 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
             </svg>
           </button>
-          <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-              d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          <span class="text-xs">My Drive</span>
+          <a 
+            routerLink="/my-drive" 
+            (click)="onNavClick()"
+            class="flex items-center gap-2 flex-1"
+          >
+            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span class="text-xs">My Drive</span>
+          </a>
         </div>
 
         @if (myDriveExpanded()) {
         <div class="ml-6 mt-1">
+          @for (folder of folders; track folder.folder_name) {
           <a 
-            routerLink="/" 
-            routerLinkActive="bg-green-50 text-green-800" 
-            [routerLinkActiveOptions]="{exact: true}"
-            (click)="onNavClick()"
-            class="flex items-center gap-2 px-2.5 py-1.5 rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-50 transition-colors text-xs"
-          >
-            <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
-            </svg>
-            <span>Root</span>
-          </a>
-          @for (folder of folders; track folder.name) {
-          <a 
-            [routerLink]="['/folder', folder.name]" 
+            [routerLink]="['/folder', folder.folder_name]" 
             (click)="onNavClick()"
             class="flex items-center gap-2 px-2.5 py-1.5 rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-50 transition-colors text-xs"
           >
             <svg class="w-3.5 h-3.5 shrink-0 text-yellow-500" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M10 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z" />
+              <path d="M10 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/>
             </svg>
-            <span class="truncate">{{ folder.name }}</span>
+            <span class="truncate">{{ folder.folder_name }}</span>
           </a>
           }
         </div>

@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { FileResponse } from '../models/fileResponse';
 import { FolderResponse } from '../models/folderResponse';
+import { FolderDataBase } from '../models/folderDataBase.model';
 import { RenameRequest } from '../models/renameRequest';
 
 @Injectable({
@@ -50,5 +51,9 @@ export class FileService {
 
   createFolder(folderName: string): Observable<any> {
     return this.http.post<any>(`${environment.apiUrl}/cloud/create/folder`, { folder_name: folderName });
+  }
+
+  listFolders(): Observable<FolderDataBase[]> {
+    return this.http.post<FolderDataBase[]>(`${environment.apiUrl}/cloud/list-folders`, {});
   }
 }

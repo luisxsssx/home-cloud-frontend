@@ -1,13 +1,10 @@
-import { Component, inject, signal, output, OnInit } from '@angular/core';
+import { Component, inject, signal, output, OnInit, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { FileService } from '../../services/file.service';
 import { ConfirmModalComponent } from '../confirm-modal/confirm-modal.component';
-
-interface Folder {
-  name: string;
-}
+import { FolderDataBase } from '../../models/folderDataBase.model';
 
 interface NavItem {
   label: string;
@@ -27,13 +24,16 @@ export class SidebarComponent implements OnInit {
   authService = inject(AuthService);
   fileService = inject(FileService);
   closeSidebar = output<void>();
+  addMenuOpen = output<void>();
+  folderCreateRequested = output<void>();
   showLogoutConfirm = signal(false);
   filesExpanded = signal(false);
   myDriveExpanded = signal(false);
+  showAddMenu = signal(false);
   folderToDelete = signal<string | null>(null);
   
   user = this.authService.getUser();
-  folders: Folder[] = [];
+  folders: FolderDataBase[] = [];
 
   navItems: NavItem[] = [
     { label: 'Recent', icon: 'clock', route: '/recent' },
@@ -45,11 +45,9 @@ export class SidebarComponent implements OnInit {
   }
 
   loadFolders(): void {
-    this.fileService.listRoot('').subscribe({
-      next: (response) => {
-        this.folders = response
-          .filter((item: any) => item.type === 'folder')
-          .map((item: any) => ({ name: item.name }));
+    this.fileService.listFolders().subscribe({
+      next: (folders) => {
+        this.folders = folders;
       }
     });
   }
@@ -111,5 +109,19 @@ export class SidebarComponent implements OnInit {
 
   cancelDeleteFolder(): void {
     this.folderToDelete.set(null);
+  }
+
+  toggleAddMenu(event: Event): void {
+    event.stopPropagation();
+    this.showAddMenu.update(v => !v);
+  }
+
+  closeAddMenu(): void {
+    this.showAddMenu.set(false);
+  }
+
+  @HostListener('document:click')
+  onDocumentClick(): void {
+    this.closeAddMenu();
   }
 }
