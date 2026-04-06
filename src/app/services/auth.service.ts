@@ -48,6 +48,12 @@ export class AuthService {
     this.router.navigate(['/login']);
   }
 
+  clearAuth(): void {
+    localStorage.removeItem(this.TOKEN_KEY);
+    localStorage.removeItem(this.USER_KEY);
+    this.isAuthenticated.set(false);
+  }
+
   getToken(): string | null {
     return localStorage.getItem(this.TOKEN_KEY);
   }

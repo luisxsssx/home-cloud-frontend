@@ -1,10 +1,15 @@
 import { Routes } from '@angular/router';
 import { LoginComponent } from './components/login/login.component';
 import { RegisterComponent } from './components/register/register.component';
+import { LandingComponent } from './components/landing/landing.component';
 import { authGuard } from './guards/auth.guard';
 import { guestGuard } from './guards/guest.guard';
 
 export const routes: Routes = [
+  { 
+    path: '', 
+    component: LandingComponent
+  },
   { 
     path: 'login', 
     component: LoginComponent,
@@ -41,9 +46,18 @@ export const routes: Routes = [
     canActivate: [authGuard]
   },
   { 
-    path: '', 
+    path: 'folder/:folderName', 
     loadComponent: () => import('./components/home/home.component').then(m => m.HomeComponent),
     canActivate: [authGuard]
+  },
+  { 
+    path: 'dashboard', 
+    loadComponent: () => import('./components/home/home.component').then(m => m.HomeComponent),
+    canActivate: [authGuard]
+  },
+  { 
+    path: '', 
+    component: LandingComponent
   },
   { path: '**', redirectTo: '' }
 ];

@@ -75,17 +75,16 @@
         </a>
       </li>
 
-      <li class="relative">
-        <div class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer"
-          [class.bg-green-50]="myDriveExpanded()"
-          [class.text-green-800]="myDriveExpanded()"
+      <li>
+        <a routerLink="/my-drive" routerLinkActive="bg-green-50 text-green-800" (click)="onNavClick()"
+          class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-50 transition-colors text-sm"
         >
           <button 
-            (click)="onMyDriveIconClick($event)"
+            (click)="onMyDriveIconClick($event); $event.preventDefault(); $event.stopPropagation()"
             class="w-4 h-4 flex items-center justify-center shrink-0"
           >
             <svg 
-              class="w-3 h-3 transition-transform duration-200" 
+              class="w-3 h-3 transition-transform duration-200 text-gray-500" 
               [class.rotate-90]="myDriveExpanded()"
               fill="none" 
               stroke="currentColor" 
@@ -94,18 +93,8 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
             </svg>
           </button>
-          <a 
-            routerLink="/my-drive" 
-            (click)="onNavClick()"
-            class="flex items-center gap-2 flex-1"
-          >
-            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <span class="text-xs">My Drive</span>
-          </a>
-        </div>
+          <span class="text-xs">My Drive</span>
+        </a>
 
         @if (myDriveExpanded()) {
         <div class="ml-6 mt-1">
@@ -126,7 +115,7 @@
       </li>
     </ul>
 
-    <ul class="space-y-0.5 mt-4">
+    <ul class="space-y-0.5">
       @for (item of navItems; track item.route) {
       <li>
         <a [routerLink]="item.route" routerLinkActive="bg-green-50 text-green-800" (click)="onNavClick()"

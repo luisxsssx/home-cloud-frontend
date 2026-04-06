@@ -43,9 +43,10 @@ export class RegisterComponent {
 
     this.authService.register(this.userData).subscribe({
       next: () => {
-        this.notificationService.success('Account created successfully!');
+        this.authService.clearAuth();
+        this.notificationService.success('Account created successfully! Please log in.');
         setTimeout(() => {
-          this.router.navigate(['/']);
+          this.router.navigate(['/login']);
         }, 1000);
       },
       error: (err) => {

@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { SidebarComponent } from '../sidebar/sidebar.component';
 import { AuthService } from '../../services/auth.service';
 import { StorageService } from '../../services/storage.service';
+import { FileService } from '../../services/file.service';
+import { NotificationService } from '../../services/notification.service';
 
 @Component({
   selector: 'app-recent',
@@ -12,12 +14,17 @@ import { StorageService } from '../../services/storage.service';
   styleUrl: './recent.component.css'
 })
 export class RecentComponent implements OnInit {
+  @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
+
   authService = inject(AuthService);
   storageService = inject(StorageService);
+  fileService = inject(FileService);
+  notificationService = inject(NotificationService);
 
   user = this.authService.getUser();
   sidebarOpen = signal(false);
   recentItems = this.storageService.recentItems;
+  uploading = signal(false);
 
   ngOnInit(): void {
   }
@@ -28,5 +35,31 @@ export class RecentComponent implements OnInit {
 
   closeSidebar(): void {
     this.sidebarOpen.set(false);
+  }
+
+  triggerFileInput(): void {
+    this.fileInput.nativeElement.click();
+  }
+
+  onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      this.uploadFile(input.files[0]);
+      input.value = '';
+    }
+  }
+
+  uploadFile(file: File): void {
+    this.uploading.set(true);
+    this.fileService.uploadFile(file, null).subscribe({
+      next: () => {
+        this.notificationService.success('File uploaded successfully');
+        this.uploading.set(false);
+      },
+      error: () => {
+        this.notificationService.error('Failed to upload file');
+        this.uploading.set(false);
+      }
+    });
   }
 }
