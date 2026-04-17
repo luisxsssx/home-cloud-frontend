@@ -158,6 +158,17 @@
                       </button>
                       @if (openMenuFor() === file.name) {
                         <div class="absolute right-0 mt-1 w-36 bg-white border border-gray-100 rounded-md shadow-lg z-10">
+                          @if (!file.name.endsWith('/')) {
+                            <button 
+                              (click)="downloadFile(file)"
+                              class="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                            >
+                              <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                              </svg>
+                              Download
+                            </button>
+                          }
                           <button 
                             (click)="renameItem(file); closeMenu()"
                             class="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"

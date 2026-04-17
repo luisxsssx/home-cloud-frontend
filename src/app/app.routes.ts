@@ -8,7 +8,8 @@ import { guestGuard } from './guards/guest.guard';
 export const routes: Routes = [
   { 
     path: '', 
-    component: LandingComponent
+    component: LandingComponent,
+    canActivate: [guestGuard]
   },
   { 
     path: 'login', 
@@ -46,18 +47,9 @@ export const routes: Routes = [
     canActivate: [authGuard]
   },
   { 
-    path: 'folder/:folderName', 
-    loadComponent: () => import('./components/home/home.component').then(m => m.HomeComponent),
-    canActivate: [authGuard]
-  },
-  { 
     path: 'dashboard', 
     loadComponent: () => import('./components/home/home.component').then(m => m.HomeComponent),
     canActivate: [authGuard]
-  },
-  { 
-    path: '', 
-    component: LandingComponent
   },
   { path: '**', redirectTo: '' }
 ];

@@ -221,4 +221,22 @@ export class MyDriveComponent implements OnInit {
   closeMenu(): void {
     this.openMenuFor.set(null);
   }
+
+  downloadFile(file: FolderResponse): void {
+    this.notificationService.success(`Downloading "${file.name}"...`);
+    this.fileService.downloadFile(file.name).subscribe({
+      next: (blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = file.name;
+        a.click();
+        window.URL.revokeObjectURL(url);
+        this.closeMenu();
+      },
+      error: () => {
+        this.notificationService.error('Failed to download file');
+      }
+    });
+  }
 }
