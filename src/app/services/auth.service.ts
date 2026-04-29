@@ -85,4 +85,12 @@ export class AuthService {
       email: response.email
     }));
   }
+
+  updateUser(data: { username?: string; email?: string }): void {
+    const user = this.getUser();
+    if (user) {
+      const updatedUser = { ...user, ...data };
+      localStorage.setItem(this.USER_KEY, JSON.stringify(updatedUser));
+    }
+  }
 }

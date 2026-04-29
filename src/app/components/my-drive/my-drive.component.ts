@@ -1,6 +1,6 @@
 import { Component, inject, signal, ViewChild, ElementRef, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { SidebarComponent } from '../sidebar/sidebar.component';
 import { ConfirmModalComponent } from '../confirm-modal/confirm-modal.component';
 import { AuthService } from '../../services/auth.service';
@@ -19,12 +19,13 @@ export class MyDriveComponent implements OnInit {
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
 
   private route = inject(ActivatedRoute);
+  private router = inject(Router);
   authService = inject(AuthService);
   fileService = inject(FileService);
   notificationService = inject(NotificationService);
 
   user = this.authService.getUser();
-  sidebarOpen = signal(false);
+  sidebarOpen = signal(true);
   files = signal<FolderResponse[]>([]);
   allFiles = signal<FolderResponse[]>([]);
   loading = signal(true);
@@ -218,7 +219,34 @@ export class MyDriveComponent implements OnInit {
     }
   }
 
+  openFolder(folderName: string): void {
+    const path = folderName.replace(/\/$/, '');
+    this.router.navigate(['/folder', path]);
+  }
+
+  isFolder(name: string): boolean {
+    return name.endsWith('/');
+  }
+
   closeMenu(): void {
     this.openMenuFor.set(null);
+  }
+
+  downloadFile(file: FolderResponse): void {
+    this.notificationService.success(`Downloading "${file.name}"...`);
+    this.fileService.downloadFile(file.name).subscribe({
+      next: (blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = file.name;
+        a.click();
+        window.URL.revokeObjectURL(url);
+        this.closeMenu();
+      },
+      error: () => {
+        this.notificationService.error('Failed to download file');
+      }
+    });
   }
 }

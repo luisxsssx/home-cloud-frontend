@@ -4,6 +4,7 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { FileService } from '../../services/file.service';
 import { ConfirmModalComponent } from '../confirm-modal/confirm-modal.component';
+import { AccountModalComponent } from '../account-modal/account-modal.component';
 import { FolderDataBase } from '../../models/folderDataBase.model';
 
 interface NavItem {
@@ -16,7 +17,7 @@ interface NavItem {
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [CommonModule, RouterLink, RouterLinkActive, ConfirmModalComponent],
+  imports: [CommonModule, RouterLink, RouterLinkActive, ConfirmModalComponent, AccountModalComponent],
   templateUrl: './sidebar.component.html',
   styleUrl: './sidebar.component.css'
 })
@@ -27,6 +28,7 @@ export class SidebarComponent implements OnInit {
   addMenuOpen = output<void>();
   folderCreateRequested = output<void>();
   showLogoutConfirm = signal(false);
+  showAccountModal = signal(false);
   filesExpanded = signal(false);
   myDriveExpanded = signal(false);
   showAddMenu = signal(false);
@@ -77,6 +79,22 @@ export class SidebarComponent implements OnInit {
 
   confirmLogout(): void {
     this.showLogoutConfirm.set(true);
+  }
+
+  openAccountModal(): void {
+    this.showAccountModal.set(true);
+  }
+
+  closeAccountModal(): void {
+    this.showAccountModal.set(false);
+  }
+
+  onAccountUpdate(data: { username?: string; email?: string } | void): void {
+    if (data && typeof data === 'object' && ('username' in data || 'email' in data)) {
+      this.authService.updateUser(data);
+      this.user = this.authService.getUser();
+    }
+    this.showAccountModal.set(false);
   }
 
   onLogoutConfirm(): void {

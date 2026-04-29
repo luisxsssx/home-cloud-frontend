@@ -136,12 +136,16 @@
                         <svg class="w-4 h-4 text-yellow-500" fill="currentColor" viewBox="0 0 24 24">
                           <path d="M10 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/>
                         </svg>
+                        <button 
+                          (click)="openFolder(file.name)"
+                          class="hover:text-green-700 hover:underline cursor-pointer"
+                        >{{ file.name }}</button>
                       } @else {
                         <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
                         </svg>
+                        <span>{{ file.name }}</span>
                       }
-                      <span>{{ file.name }}</span>
                     </div>
                   </td>
                   <td class="px-4 py-2.5 text-sm text-gray-500 text-right">{{ file.size }} bytes</td>
@@ -158,6 +162,17 @@
                       </button>
                       @if (openMenuFor() === file.name) {
                         <div class="absolute right-0 mt-1 w-36 bg-white border border-gray-100 rounded-md shadow-lg z-10">
+                          @if (!file.name.endsWith('/')) {
+                            <button 
+                              (click)="downloadFile(file)"
+                              class="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                            >
+                              <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                              </svg>
+                              Download
+                            </button>
+                          }
                           <button 
                             (click)="renameItem(file); closeMenu()"
                             class="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"

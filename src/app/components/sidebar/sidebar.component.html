@@ -1,4 +1,8 @@
 <aside class="w-56 bg-white border-r border-gray-100 flex flex-col h-screen">
+  @if (showAccountModal()) {
+  <app-account-modal [user]="user" (close)="onAccountUpdate($event)"></app-account-modal>
+  }
+
   @if (showLogoutConfirm()) {
   <app-confirm-modal (confirm)="onLogoutConfirm()" (cancel)="onLogoutCancel()"></app-confirm-modal>
   }
@@ -100,8 +104,7 @@
         <div class="ml-6 mt-1">
           @for (folder of folders; track folder.folder_name) {
           <a 
-            [routerLink]="['/folder', folder.folder_name]" 
-            (click)="onNavClick()"
+            [routerLink]="['/folder', folder.folder_name]"
             class="flex items-center gap-2 px-2.5 py-1.5 rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-50 transition-colors text-xs"
           >
             <svg class="w-3.5 h-3.5 shrink-0 text-yellow-500" fill="currentColor" viewBox="0 0 24 24">
@@ -149,13 +152,20 @@
 
   <div class="p-3 border-t border-gray-100">
     <div class="flex items-center gap-2.5 mb-2">
-      <div class="w-7 h-7 bg-gray-100 rounded-full flex items-center justify-center">
-        <span class="text-xs font-medium text-gray-500">{{ user?.username?.[0]?.toUpperCase() || 'U' }}</span>
-      </div>
-      <div class="flex-1 min-w-0">
-        <p class="text-xs font-medium text-gray-600 truncate">{{ user?.username }}</p>
-        <p class="text-[10px] text-gray-400 truncate">{{ user?.email }}</p>
-      </div>
+      <button (click)="openAccountModal()" class="flex items-center gap-2.5 hover:bg-gray-50 rounded-md transition-colors p-1.5 -m-1.5 flex-1">
+        <div class="w-7 h-7 bg-gray-100 rounded-full flex items-center justify-center shrink-0">
+          <span class="text-xs font-medium text-gray-500">{{ user?.username?.[0]?.toUpperCase() || 'U' }}</span>
+        </div>
+        <div class="flex-1 min-w-0 text-left">
+          <p class="text-xs font-medium text-gray-600 truncate">{{ user?.username }}</p>
+          <p class="text-[10px] text-gray-400 truncate">{{ user?.email }}</p>
+        </div>
+      </button>
+      <button (click)="openAccountModal()" class="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-md transition-colors" title="Edit account">
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+        </svg>
+      </button>
     </div>
     <button (click)="confirmLogout()"
       class="w-full flex items-center justify-center gap-1.5 px-2 py-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-md transition-colors text-xs">
