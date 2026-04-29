@@ -58,7 +58,7 @@ export class AuthService {
     return localStorage.getItem(this.TOKEN_KEY);
   }
 
-  getUser(): { username: string; email: string } | null {
+  getUser(): { username: string; email: string, created_at: string } | null {
     const user = localStorage.getItem(this.USER_KEY);
     return user ? JSON.parse(user) : null;
   }
@@ -80,9 +80,20 @@ export class AuthService {
   }
 
   private storeUser(response: AuthResponse): void {
+    const token = response.token;
+    let createdAt = '';
+
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      createdAt = payload.created_at || '';
+    } catch {
+      // ignore
+    }
+
     localStorage.setItem(this.USER_KEY, JSON.stringify({
       username: response.username,
-      email: response.email
+      email: response.email,
+      created_at: createdAt
     }));
   }
 

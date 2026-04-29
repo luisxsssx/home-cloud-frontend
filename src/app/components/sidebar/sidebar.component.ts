@@ -1,10 +1,9 @@
 import { Component, inject, signal, output, OnInit, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { FileService } from '../../services/file.service';
 import { ConfirmModalComponent } from '../confirm-modal/confirm-modal.component';
-import { AccountModalComponent } from '../account-modal/account-modal.component';
 import { FolderDataBase } from '../../models/folderDataBase.model';
 
 interface NavItem {
@@ -17,18 +16,19 @@ interface NavItem {
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [CommonModule, RouterLink, RouterLinkActive, ConfirmModalComponent, AccountModalComponent],
+  imports: [CommonModule, RouterLink, RouterLinkActive, ConfirmModalComponent],
   templateUrl: './sidebar.component.html',
   styleUrl: './sidebar.component.css'
 })
 export class SidebarComponent implements OnInit {
+  private router = inject(Router);
   authService = inject(AuthService);
   fileService = inject(FileService);
   closeSidebar = output<void>();
   addMenuOpen = output<void>();
   folderCreateRequested = output<void>();
   showLogoutConfirm = signal(false);
-  showAccountModal = signal(false);
+  showAccountPopup = signal(false);
   filesExpanded = signal(false);
   myDriveExpanded = signal(false);
   showAddMenu = signal(false);
@@ -78,23 +78,21 @@ export class SidebarComponent implements OnInit {
   }
 
   confirmLogout(): void {
+    this.showAccountPopup.set(false);
     this.showLogoutConfirm.set(true);
   }
 
-  openAccountModal(): void {
-    this.showAccountModal.set(true);
+  toggleAccountPopup(): void {
+    this.showAccountPopup.update(v => !v);
   }
 
-  closeAccountModal(): void {
-    this.showAccountModal.set(false);
+  goToSettings(): void {
+    this.showAccountPopup.set(false);
+    this.router.navigate(['/settings']);
   }
 
-  onAccountUpdate(data: { username?: string; email?: string } | void): void {
-    if (data && typeof data === 'object' && ('username' in data || 'email' in data)) {
-      this.authService.updateUser(data);
-      this.user = this.authService.getUser();
-    }
-    this.showAccountModal.set(false);
+  closeAccountPopup(): void {
+    this.showAccountPopup.set(false);
   }
 
   onLogoutConfirm(): void {
@@ -141,5 +139,6 @@ export class SidebarComponent implements OnInit {
   @HostListener('document:click')
   onDocumentClick(): void {
     this.closeAddMenu();
+    this.closeAccountPopup();
   }
 }
