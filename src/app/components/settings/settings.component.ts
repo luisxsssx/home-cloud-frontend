@@ -20,6 +20,8 @@ export class SettingsComponent {
 
   user = this.authService.getUser();
 
+  // Coment
+
   editProfile = signal(false);
   editUsername = signal(this.user?.username || '');
   editEmail = signal(this.user?.email || '');
