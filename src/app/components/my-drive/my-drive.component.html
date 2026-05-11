@@ -1,54 +1,42 @@
 <div class="min-h-screen flex bg-gray-50">
   @if (sidebarOpen()) {
-    <div 
-      class="fixed inset-0 bg-black/40 z-40 md:hidden backdrop-blur-sm"
-      (click)="closeSidebar()"
-    ></div>
+  <div class="fixed inset-0 bg-black/40 z-40 md:hidden backdrop-blur-sm" (click)="closeSidebar()"></div>
   }
 
-  <div 
-    class="fixed inset-y-0 left-0 z-50 w-56 transform transition-transform duration-200 ease-out md:hidden"
-    [class.translate-x-0]="sidebarOpen()"
-    [class.-translate-x-full]="!sidebarOpen()"
-  >
-    <app-sidebar (closeSidebar)="closeSidebar()" (addMenuOpen)="triggerFileInput()" (folderCreateRequested)="openCreateFolderModal()"></app-sidebar>
+  <div class="fixed inset-y-0 left-0 z-50 w-56 transform transition-transform duration-200 ease-out md:hidden"
+    [class.translate-x-0]="sidebarOpen()" [class.-translate-x-full]="!sidebarOpen()">
+    <app-sidebar (closeSidebar)="closeSidebar()" (addMenuOpen)="triggerFileInput()"
+      (folderCreateRequested)="openCreateFolderModal()"></app-sidebar>
   </div>
 
-  <app-sidebar class="hidden md:flex" (addMenuOpen)="triggerFileInput()" (folderCreateRequested)="openCreateFolderModal()"></app-sidebar>
-  
+  <app-sidebar class="hidden md:flex" (addMenuOpen)="triggerFileInput()"
+    (folderCreateRequested)="openCreateFolderModal()"></app-sidebar>
+
   <main class="flex-1 flex flex-col min-w-0">
     <header class="bg-white border-b border-gray-100 px-3 py-2.5 md:px-5 md:py-3">
       <div class="flex items-center justify-between gap-3">
-        <button 
-          (click)="toggleSidebar()"
-          class="md:hidden p-1.5 text-gray-500 hover:bg-gray-100 rounded-md"
-        >
+        <button (click)="toggleSidebar()" class="md:hidden p-1.5 text-gray-500 hover:bg-gray-100 rounded-md">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M4 12h16M4 18h16" />
           </svg>
         </button>
-        
+
         <div class="flex-1 max-w-xl">
           <div class="relative">
-            <svg class="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            <svg class="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none"
+              stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
-            <input 
-              type="text" 
-              placeholder="Search files..."
-              [value]="searchQuery()"
-              (input)="onSearchChange($event)"
-              class="w-full pl-9 pr-8 py-1.5 text-sm bg-gray-50 border-transparent rounded-md focus:bg-white focus:border-green-600 focus:ring-1 focus:ring-green-200 focus:outline-none transition-all"
-            />
+            <input type="text" placeholder="Search files..." [value]="searchQuery()" (input)="onSearchChange($event)"
+              class="w-full pl-9 pr-8 py-1.5 text-sm bg-gray-50 border-transparent rounded-md focus:bg-white focus:border-green-600 focus:ring-1 focus:ring-green-200 focus:outline-none transition-all" />
             @if (searchQuery()) {
-              <button 
-                (click)="clearSearch()"
-                class="absolute right-2.5 top-1/2 -translate-y-1/2 p-0.5 text-gray-400 hover:text-gray-600"
-              >
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
+            <button (click)="clearSearch()"
+              class="absolute right-2.5 top-1/2 -translate-y-1/2 p-0.5 text-gray-400 hover:text-gray-600">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
             }
           </div>
         </div>
@@ -56,205 +44,256 @@
     </header>
 
     <div class="flex-1 p-3 md:p-5 overflow-auto">
-      <div class="mb-3 md:mb-5 flex items-center justify-between">
-        <div>
-          <h1 class="text-lg md:text-xl font-medium text-gray-700">My Drive</h1>
-          <p class="text-gray-400 mt-0.5 text-xs md:text-sm">Welcome back, {{ user?.username }}</p>
-        </div>
-        @if (searchQuery()) {
-          <span class="text-xs text-gray-400">{{ files().length }} result{{ files().length === 1 ? '' : 's' }}</span>
-        }
+      <div class="mb-3 md:mb-5">
+        <nav class="flex items-center gap-1 text-sm">
+          @if (currentFolder()) {
+            <button (click)="goBack()" class="text-gray-500 hover:text-green-700 transition-colors cursor-pointer">
+              My Drive
+            </button>
+          } @else {
+            <span class="text-gray-700 font-medium">My Drive</span>
+          }
+          @for (seg of breadcrumbSegments; track seg.path) {
+          <svg class="w-3 h-3 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+          </svg>
+          @if (seg.isLast) {
+            <span class="text-gray-700 font-medium truncate">{{ seg.name }}</span>
+          } @else {
+            <button (click)="goToBreadcrumb(seg)"
+              class="truncate text-gray-500 hover:text-green-700 transition-colors cursor-pointer">
+              {{ seg.name }}
+            </button>
+          }
+          }
+        </nav>
+        <p class="text-gray-400 mt-1 text-xs md:text-sm">Welcome back, {{ user?.username }}</p>
       </div>
 
       @if (loading()) {
-        <div class="flex items-start">
-          <div class="bg-white rounded-md shadow-sm border border-gray-100 p-5 md:p-6 text-center flex-1">
-            <div class="flex justify-center mb-3">
-              <div class="w-6 h-6 border-2 border-green-700 border-t-transparent rounded-full animate-spin"></div>
-            </div>
-            <p class="text-gray-400 text-xs md:text-sm">Loading...</p>
+      <div class="flex items-start">
+        <div class="bg-white rounded-md shadow-sm border border-gray-100 p-5 md:p-6 text-center flex-1">
+          <div class="flex justify-center mb-3">
+            <div class="w-6 h-6 border-2 border-green-700 border-t-transparent rounded-full animate-spin"></div>
           </div>
+          <p class="text-gray-400 text-xs md:text-sm">Loading...</p>
         </div>
+      </div>
       } @else if (files().length === 0) {
-        <div class="flex items-start">
-          <div class="bg-white rounded-md shadow-sm border border-gray-100 p-5 md:p-6 text-center flex-1">
-            <div class="w-12 h-12 md:w-14 md:h-14 mx-auto mb-3 bg-green-50 rounded-full flex items-center justify-center">
-              @if (searchQuery()) {
-                <svg class="w-6 h-6 md:w-7 md:h-7 text-green-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-              } @else {
-                <svg class="w-6 h-6 md:w-7 md:h-7 text-green-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
-                </svg>
-              }
-            </div>
+      <div class="flex items-start">
+        <div class="bg-white rounded-md shadow-sm border border-gray-100 p-5 md:p-6 text-center flex-1">
+          <div class="w-12 h-12 md:w-14 md:h-14 mx-auto mb-3 bg-green-50 rounded-full flex items-center justify-center">
             @if (searchQuery()) {
-              <h3 class="text-sm md:text-base font-medium text-gray-600 mb-1.5">No results found</h3>
-              <p class="text-gray-400 mb-3 text-xs md:text-sm">No files match "{{ searchQuery() }}"</p>
+            <svg class="w-6 h-6 md:w-7 md:h-7 text-green-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
             } @else {
-              <h3 class="text-sm md:text-base font-medium text-gray-600 mb-1.5">No files yet</h3>
-              <p class="text-gray-400 mb-3 text-xs md:text-sm">Upload your first file to get started</p>
+            <svg class="w-6 h-6 md:w-7 md:h-7 text-green-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+            </svg>
             }
           </div>
-          <div class="ml-4 p-4">
-            <input 
-              #fileInput
-              type="file" 
-              class="hidden" 
-              (change)="onFileSelected($event)"
-            />
-            <button 
-              (click)="triggerFileInput()"
-              [disabled]="uploading()"
-              class="px-3.5 py-1.5 bg-green-700 text-white text-xs rounded-md hover:bg-green-800 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
-            >
-              @if (uploading()) {
-                Uploading...
-              } @else {
-                Upload
-              }
-            </button>
-          </div>
+          @if (searchQuery()) {
+          <h3 class="text-sm md:text-base font-medium text-gray-600 mb-1.5">No results found</h3>
+          <p class="text-gray-400 mb-3 text-xs md:text-sm">No files match "{{ searchQuery() }}"</p>
+          } @else {
+          <h3 class="text-sm md:text-base font-medium text-gray-600 mb-1.5">No files yet</h3>
+          <p class="text-gray-400 mb-3 text-xs md:text-sm">Upload your first file to get started</p>
+          }
         </div>
+        <div class="ml-4 p-4">
+          <input #fileInput type="file" class="hidden" (change)="onFileSelected($event)" />
+          <button (click)="triggerFileInput()" [disabled]="uploading()"
+            class="px-3.5 py-1.5 bg-green-700 text-white text-xs rounded-md hover:bg-green-800 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap">
+            @if (uploading()) {
+            Uploading...
+            } @else {
+            Upload
+            }
+          </button>
+        </div>
+      </div>
       } @else {
-        <div class="bg-white rounded-md shadow-sm border border-gray-100 overflow-hidden">
-          <table class="w-full">
-            <thead class="bg-gray-50 border-b border-gray-100">
-              <tr>
-                <th class="text-left px-4 py-2.5 text-xs font-medium text-gray-500 uppercase">Name</th>
-                <th class="text-right px-4 py-2.5 text-xs font-medium text-gray-500 uppercase">Size</th>
-                <th class="text-right px-4 py-2.5 text-xs font-medium text-gray-500 uppercase">Actions</th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-50">
-              @for (file of files(); track file.name) {
-                <tr class="hover:bg-gray-50">
-                  <td class="px-4 py-2.5 text-sm text-gray-700">
-                    <div class="flex items-center gap-2">
-                      @if (file.name.endsWith('/')) {
-                        <svg class="w-4 h-4 text-yellow-500" fill="currentColor" viewBox="0 0 24 24">
-                          <path d="M10 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/>
-                        </svg>
-                        <button 
-                          (click)="openFolder(file.name)"
-                          class="hover:text-green-700 hover:underline cursor-pointer"
-                        >{{ file.name }}</button>
-                      } @else {
-                        <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
-                        </svg>
-                        <span>{{ file.name }}</span>
-                      }
-                    </div>
-                  </td>
-                  <td class="px-4 py-2.5 text-sm text-gray-500 text-right">{{ file.size }} bytes</td>
-                  <td class="px-4 py-2.5 text-right">
-                    <div class="relative inline-block">
-                      <button 
-                        (click)="toggleMenu(file.name, $event)"
-                        class="p-1 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded transition-colors"
-                        title="More actions"
-                      >
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
-                        </svg>
-                      </button>
-                      @if (openMenuFor() === file.name) {
-                        <div class="absolute right-0 mt-1 w-36 bg-white border border-gray-100 rounded-md shadow-lg z-10">
-                          @if (!file.name.endsWith('/')) {
-                            <button 
-                              (click)="downloadFile(file)"
-                              class="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
-                            >
-                              <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                              </svg>
-                              Download
-                            </button>
-                          }
-                          <button 
-                            (click)="renameItem(file); closeMenu()"
-                            class="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
-                          >
-                            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                            </svg>
-                            Rename
-                          </button>
-                          <button 
-                            (click)="deleteItem(file); closeMenu()"
-                            class="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
-                          >
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                            </svg>
-                            Delete
-                          </button>
-                        </div>
-                      }
-                    </div>
-                  </td>
-                </tr>
-              }
-            </tbody>
-          </table>
-          <div class="px-4 py-3 bg-gray-50 border-t border-gray-100">
-            <input 
-              #fileInput
-              type="file" 
-              class="hidden" 
-              (change)="onFileSelected($event)"
-            />
-            <button 
-              (click)="triggerFileInput()"
-              [disabled]="uploading()"
-              class="text-xs text-green-700 hover:text-green-800 font-medium disabled:opacity-50"
-            >
-              @if (uploading()) {
-                Uploading...
-              } @else {
-                Upload more files
-              }
-            </button>
-          </div>
+      <div class="bg-white rounded-md shadow-sm border border-gray-100">
+        <table class="w-full">
+          <thead class="bg-gray-50 border-b border-gray-100">
+            <tr>
+              <th class="text-left px-4 py-2.5 text-xs font-medium text-gray-500 uppercase">Name</th>
+              <th class="text-right px-4 py-2.5 text-xs font-medium text-gray-500 uppercase">Size</th>
+              <th class="text-right px-4 py-2.5 text-xs font-medium text-gray-500 uppercase">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-50">
+            @for (file of files(); track file.name) {
+            @if (file.name.endsWith('/')) {
+            <tr class="hover:bg-gray-50 transition-colors" [class.bg-green-50]="dragOverItem() === file.name"
+              [class.outline]="dragOverItem() === file.name" [class.outline-2]="dragOverItem() === file.name"
+              [class.outline-green-500]="dragOverItem() === file.name"
+              [class.outline-offset-[-1px]]="dragOverItem() === file.name" (dragover)="onDragOver($event, file.name)"
+              (dragleave)="onDragLeave(file.name)" (drop)="onDrop($event, file.name)">
+              <td class="px-4 py-2.5 text-sm text-gray-700">
+                <div class="flex items-center gap-2">
+                  <svg class="w-4 h-4 text-yellow-500" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M10 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z" />
+                  </svg>
+                  <button (click)="openFolder(file.name)" class="hover:text-green-700 hover:underline cursor-pointer">{{
+                    file.name }}</button>
+                </div>
+              </td>
+              <td class="px-4 py-2.5 text-sm text-gray-500 text-right">{{ file.size }} bytes</td>
+              <td class="px-4 py-2.5 text-right">
+                <div class="relative inline-block">
+                  <button (click)="toggleMenu(file.name, $event)"
+                    class="p-1 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded transition-colors"
+                    title="More actions">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+                    </svg>
+                  </button>
+                  @if (openMenuFor() === file.name) {
+                  <div class="absolute right-0 mt-1 w-36 bg-white border border-gray-100 rounded-md shadow-lg z-10">
+                    <button (click)="renameItem(file); closeMenu()"
+                      class="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+                      <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                          d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                      </svg>
+                      Rename
+                    </button>
+                    <button (click)="deleteItem(file); closeMenu()"
+                      class="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
+                      Delete
+                    </button>
+                  </div>
+                  }
+                </div>
+              </td>
+            </tr>
+            } @else {
+            <tr draggable="true" class="hover:bg-gray-50 cursor-grab active:cursor-grabbing"
+              (dragstart)="onDragStart($event, file)">
+              <td class="px-4 py-2.5 text-sm text-gray-700">
+                <div class="flex items-center gap-2">
+                  <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                      d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                  </svg>
+                  <span>{{ file.name }}</span>
+                </div>
+              </td>
+              <td class="px-4 py-2.5 text-sm text-gray-500 text-right">{{ file.size }} bytes</td>
+              <td class="px-4 py-2.5 text-right">
+                <div class="relative inline-block">
+                  <button (click)="toggleMenu(file.name, $event)"
+                    class="p-1 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded transition-colors"
+                    title="More actions">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+                    </svg>
+                  </button>
+                  @if (openMenuFor() === file.name) {
+                  <div class="absolute right-0 mt-1 w-36 bg-white border border-gray-100 rounded-md shadow-lg z-10">
+                    <button (click)="downloadFile(file)"
+                      class="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+                      <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                          d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                      </svg>
+                      Download
+                    </button>
+                    <button (click)="renameItem(file); closeMenu()"
+                      class="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+                      <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                          d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                      </svg>
+                      Rename
+                    </button>
+                    <button (click)="deleteItem(file); closeMenu()"
+                      class="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
+                      Delete
+                    </button>
+                  </div>
+                  }
+                </div>
+              </td>
+            </tr>
+            }
+            }
+          </tbody>
+        </table>
+        <div class="px-4 py-3 bg-gray-50 border-t border-gray-100">
+          <input #fileInput type="file" class="hidden" (change)="onFileSelected($event)" />
+          <button (click)="triggerFileInput()" [disabled]="uploading()"
+            class="text-xs text-green-700 hover:text-green-800 font-medium disabled:opacity-50">
+            @if (uploading()) {
+            Uploading...
+            } @else {
+            Upload more files
+            }
+          </button>
         </div>
+      </div>
       }
     </div>
   </main>
 </div>
 
+@if (isDragging()) {
+<div class="fixed bottom-0 left-0 right-0 z-50 flex items-center justify-center h-20 transition-all duration-200"
+  [class.bg-red-600]="dragOverDelete()" [class.bg-red-500]="!dragOverDelete()" (dragover)="onDragOverDelete($event)"
+  (dragleave)="onDragLeaveDelete()" (drop)="onDropDelete($event)">
+  <svg class="w-6 h-6 text-white mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+  </svg>
+  <span class="text-white text-sm font-medium">
+    @if (dragOverDelete()) {
+    Drop to delete
+    } @else {
+    Drag files here to delete
+    }
+  </span>
+</div>
+}
+
 @if (itemToDelete()) {
-  <app-confirm-modal
-    [title]="'Delete ' + (itemToDelete()!.type === 'folder' ? 'folder' : 'file')"
-    [message]="'Are you sure you want to delete \'' + itemToDelete()!.name + '\'?'"
+<app-confirm-modal [title]="'Delete ' + (itemToDelete()!.type === 'folder' ? 'folder' : 'file')"
+  [message]="'Are you sure you want to delete \'' + itemToDelete()!.name + '\'?'" confirmText="Delete"
+  (confirm)="confirmDelete()" (cancel)="cancelDelete()"></app-confirm-modal>
+}
+
+@if (pendingDeleteFile()) {
+<app-confirm-modal
+    [title]="'Delete ' + (pendingDeleteFile()!.endsWith('/') ? 'folder' : 'file')"
+    [message]="'Are you sure you want to delete \'' + pendingDeleteFile()!.split('/').pop() + '\'?'"
     confirmText="Delete"
-    (confirm)="confirmDelete()"
-    (cancel)="cancelDelete()"
+    (confirm)="confirmDragDelete()"
+    (cancel)="cancelDragDelete()"
   ></app-confirm-modal>
 }
 
 @if (itemToRename()) {
-  <app-confirm-modal
-    [title]="'Rename ' + (itemToRename()!.type === 'folder' ? 'folder' : 'file')"
-    [message]="'Enter a new name for this ' + itemToRename()!.type"
-    confirmText="Rename"
-    [showInput]="true"
-    [inputValue]="itemToRename()!.name"
-    [inputPlaceholder]="'New name'"
-    (confirm)="confirmRename($event)"
-    (cancel)="cancelRename()"
-  ></app-confirm-modal>
+<app-confirm-modal [title]="'Rename ' + (itemToRename()!.type === 'folder' ? 'folder' : 'file')"
+  [message]="'Enter a new name for this ' + itemToRename()!.type" confirmText="Rename" [showInput]="true"
+  [inputValue]="itemToRename()!.name" [inputPlaceholder]="'New name'" (confirm)="confirmRename($event)"
+  (cancel)="cancelRename()"></app-confirm-modal>
 }
 
 @if (showCreateFolderModal()) {
-  <app-confirm-modal
-    title="Create new folder"
-    message="Enter a name for the new folder"
-    confirmText="Create"
-    [showInput]="true"
-    [inputPlaceholder]="'Folder name'"
-    (confirm)="confirmCreateFolder($event)"
-    (cancel)="cancelCreateFolder()"
-  ></app-confirm-modal>
+<app-confirm-modal title="Create new folder" message="Enter a name for the new folder" confirmText="Create"
+  [showInput]="true" [inputPlaceholder]="'Folder name'" (confirm)="confirmCreateFolder($event)"
+  (cancel)="cancelCreateFolder()"></app-confirm-modal>
 }

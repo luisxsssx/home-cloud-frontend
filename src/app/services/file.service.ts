@@ -62,4 +62,8 @@ export class FileService {
       responseType: 'blob'
     });
   }
+
+  moveItem(sourcePath: string, targetPath: string): Observable<any> {
+    return this.http.post<any>(`${environment.apiUrl}/cloud/move/data`, { sourcePath, targetPath });
+  }
 }
