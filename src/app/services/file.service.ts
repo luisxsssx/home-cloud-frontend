@@ -54,7 +54,7 @@ export class FileService {
   }
 
   listFolders(): Observable<FolderDataBase[]> {
-    return this.http.post<FolderDataBase[]>(`${environment.apiUrl}/cloud/list-folders`, {});
+    return this.http.post<FolderDataBase[]>(`${environment.apiUrl}/cloud/list-root-folders`, {});
   }
 
   downloadFile(fileName: string): Observable<Blob> {
