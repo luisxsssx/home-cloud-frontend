@@ -1,59 +1,71 @@
-# PersonalCloud
+# Personal Cloud
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.3.3.
+Angular frontend for a personal cloud storage application. Uses a Spring Boot backend for file management and authentication.
 
-## Development server
+## Features
 
-To start a local development server, run:
+- **Authentication** — Login, registration, JWT auth with route guards
+- **File Management** — Upload, download, rename, delete files and folders
+- **Folder Navigation** — Breadcrumb trail with clickable segments for nested folders
+- **Drag & Drop** — Drag files to move between folders; drag to the delete zone at the bottom
+- **Search** — Filter files by name in the current directory
+- **User Settings** — Profile editing, password change, storage overview, account deletion
+- **Responsive** — Sidebar collapses on mobile
+
+## Tech Stack
+
+- Angular 17+
+- TailwindCSS
+- TypeScript
+
+## Project Structure
+
+```
+src/app/
+├── components/
+│   ├── account-modal/      # Edit account modal
+│   ├── confirm-modal/      # Reusable confirmation dialog
+│   ├── home/               # Dashboard / landing after login
+│   ├── landing/            # Public landing page
+│   ├── login/              # Login form
+│   ├── my-drive/           # Main file browser with drag-and-drop
+│   ├── notification/       # Toast notification component
+│   ├── recent/             # Recently accessed files
+│   ├── register/           # Registration form
+│   ├── settings/           # User settings page
+│   ├── settings-sidebar/   # Settings navigation sidebar
+│   ├── sidebar/            # App sidebar with folder tree
+│   └── trash/              # Deleted files
+├── guards/                 # Auth and guest route guards
+├── interceptors/           # JWT interceptor
+├── models/                 # TypeScript interfaces
+├── services/               # API services (auth, files, notifications)
+└── app.routes.ts           # Route definitions
+```
+
+## Development
 
 ```bash
+npm install
 ng serve
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+Navigate to `http://localhost:4200`.
 
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
+## Build
 
 ```bash
 ng build
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+Production build output goes to `dist/`.
 
-## Running unit tests
+## Environment
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+Configure the backend API URL in `src/environments/environment.ts`:
 
-```bash
-ng test
+```ts
+export const environment = {
+  apiUrl: 'http://localhost:8080'
+};
 ```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
