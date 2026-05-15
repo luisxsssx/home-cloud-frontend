@@ -6,6 +6,7 @@ import { FileResponse } from '../models/fileResponse';
 import { FolderResponse } from '../models/folderResponse';
 import { FolderDataBase } from '../models/folderDataBase.model';
 import { RenameRequest } from '../models/renameRequest';
+import { FileItemResponse } from '../models/fileItemResponse';
 
 export interface BucketModel {
   bucket_id: number;
@@ -117,8 +118,16 @@ export class FileService {
     });
   }
 
+  listAllFiles(): Observable<FileItemResponse[]> {
+    return this.http.get<FileItemResponse[]>(`${this.apiUrl}/all`);
+  }
+
   listFolders(): Observable<FolderDataBase[]> {
     return this.http.post<FolderDataBase[]>(`${environment.apiUrl}/cloud/list-root-folders`, {});
+  }
+
+  listAllFolders(): Observable<FolderDataBase[]> {
+    return this.http.post<FolderDataBase[]>(`${environment.apiUrl}/cloud/list-folders`, {});
   }
 
   downloadFile(fileName: string): Observable<Blob> {

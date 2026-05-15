@@ -66,7 +66,7 @@
             </div>
             <div>
               <p class="text-xs text-gray-400">Total Files</p>
-              <p class="text-lg font-medium text-gray-700">-</p>
+              <p class="text-lg font-medium text-gray-700">{{ totalFiles() }}</p>
             </div>
           </div>
         </div>
@@ -80,7 +80,7 @@
             </div>
             <div>
               <p class="text-xs text-gray-400">Folders</p>
-              <p class="text-lg font-medium text-gray-700">-</p>
+              <p class="text-lg font-medium text-gray-700">{{ totalFolders() }}</p>
             </div>
           </div>
         </div>
@@ -100,22 +100,43 @@
         </div>
       </div>
 
-      <div class="bg-white rounded-md shadow-sm border border-gray-100 p-5">
-        <h2 class="text-base font-medium text-gray-700 mb-3">Quick Actions</h2>
-        <div class="flex flex-wrap gap-3">
-          <div class="flex items-center gap-2 px-3 py-2 bg-gray-50 rounded-md">
-            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
-            </svg>
-            <span class="text-sm text-gray-600">Upload files from My Drive</span>
+      <div class="bg-white rounded-md shadow-sm border border-gray-100 overflow-hidden">
+        <h2 class="text-base font-medium text-gray-700 px-5 pt-4 pb-2">Recently Added</h2>
+        @if (loading()) {
+          <div class="flex justify-center py-6">
+            <div class="w-5 h-5 border-2 border-green-700 border-t-transparent rounded-full animate-spin"></div>
           </div>
-          <div class="flex items-center gap-2 px-3 py-2 bg-gray-50 rounded-md">
-            <svg class="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M10 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/>
-            </svg>
-            <span class="text-sm text-gray-600">Create folder from My Drive</span>
-          </div>
-        </div>
+        } @else if (recentFiles().length === 0) {
+          <p class="text-sm text-gray-400 py-6 text-center">No files uploaded yet</p>
+        } @else {
+          <table class="w-full">
+            <thead class="bg-gray-50 border-y border-gray-100">
+              <tr>
+                <th class="text-left px-4 py-2 text-xs font-medium text-gray-500 uppercase">Name</th>
+                <th class="text-left px-4 py-2 text-xs font-medium text-gray-500 uppercase">Folder</th>
+                <th class="text-right px-4 py-2 text-xs font-medium text-gray-500 uppercase">Size</th>
+                <th class="text-right px-4 py-2 text-xs font-medium text-gray-500 uppercase">Date</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-50">
+              @for (file of recentFiles(); track file.fileName + file.createdAt) {
+                <tr class="hover:bg-gray-50">
+                  <td class="px-4 py-2.5 text-sm text-gray-700">
+                    <div class="flex items-center gap-2">
+                      <svg class="w-4 h-4 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                      </svg>
+                      <span class="truncate">{{ file.fileName }}</span>
+                    </div>
+                  </td>
+                  <td class="px-4 py-2.5 text-sm text-gray-500">{{ file.folderName || '-' }}</td>
+                  <td class="px-4 py-2.5 text-sm text-gray-500 text-right">{{ file.fileSize }} bytes</td>
+                  <td class="px-4 py-2.5 text-sm text-gray-500 text-right">{{ file.createdAt | date:'MMM d, HH:mm' }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
       </div>
     </div>
   </main>

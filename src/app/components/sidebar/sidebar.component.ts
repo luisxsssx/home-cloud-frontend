@@ -13,6 +13,22 @@ interface NavItem {
   expandable?: boolean;
 }
 
+interface FolderNode {
+  name: string;
+  fullPath: string;
+  children: FolderNode[];
+  expanded: boolean;
+}
+
+interface FlatFolderItem {
+  name: string;
+  fullPath: string;
+  depth: number;
+  hasChildren: boolean;
+  expanded: boolean;
+  node: FolderNode;
+}
+
 @Component({
   selector: 'app-sidebar',
   standalone: true,
@@ -35,7 +51,8 @@ export class SidebarComponent implements OnInit {
   folderToDelete = signal<string | null>(null);
   
   user = this.authService.getUser();
-  folders: FolderDataBase[] = [];
+  folderTree = signal<FolderNode[]>([]);
+  flatFolders = signal<FlatFolderItem[]>([]);
 
   navItems: NavItem[] = [
     { label: 'Recent', icon: 'clock', route: '/recent' },
@@ -50,11 +67,60 @@ export class SidebarComponent implements OnInit {
   }
 
   loadFolders(): void {
-    this.fileService.listFolders().subscribe({
+    this.fileService.listAllFolders().subscribe({
       next: (folders) => {
-        this.folders = folders;
+        const tree = this.buildFolderTree(folders.map(f => f.folder_name));
+        this.folderTree.set(tree);
+        this.flatFolders.set(this.flattenTree(tree));
       }
     });
+  }
+
+  private flattenTree(nodes: FolderNode[], depth = 0): FlatFolderItem[] {
+    const result: FlatFolderItem[] = [];
+    for (const node of nodes) {
+      result.push({ name: node.name, fullPath: node.fullPath, depth, hasChildren: node.children.length > 0, expanded: node.expanded, node });
+      if (node.expanded && node.children.length > 0) {
+        result.push(...this.flattenTree(node.children, depth + 1));
+      }
+    }
+    return result;
+  }
+
+  private buildFolderTree(folderNames: string[]): FolderNode[] {
+    const root: FolderNode[] = [];
+
+    for (const path of folderNames) {
+      const parts = path.split('/');
+      let current = root;
+
+      for (let i = 0; i < parts.length; i++) {
+        const part = parts[i];
+        let node = current.find(n => n.name === part);
+
+        if (!node) {
+          node = {
+            name: part,
+            fullPath: parts.slice(0, i + 1).join('/'),
+            children: [],
+            expanded: false,
+          };
+          current.push(node);
+        }
+
+        if (i < parts.length - 1) {
+          current = node.children;
+        }
+      }
+    }
+
+    return root;
+  }
+
+  toggleFolderNode(node: FolderNode): void {
+    node.expanded = !node.expanded;
+    this.folderTree.set([...this.folderTree()]);
+    this.flatFolders.set(this.flattenTree(this.folderTree()));
   }
 
   toggleFilesSection(): void {

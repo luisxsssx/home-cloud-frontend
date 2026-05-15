@@ -1,18 +1,19 @@
-import { Component, inject, signal, ViewChild, ElementRef } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, inject, signal, ViewChild, ElementRef, OnInit } from '@angular/core';
+import { CommonModule, DatePipe } from '@angular/common';
 import { SidebarComponent } from '../sidebar/sidebar.component';
 import { AuthService } from '../../services/auth.service';
 import { FileService } from '../../services/file.service';
 import { NotificationService } from '../../services/notification.service';
+import { FileItemResponse } from '../../models/fileItemResponse';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, SidebarComponent],
+  imports: [CommonModule, SidebarComponent, DatePipe],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css'
 })
-export class HomeComponent {
+export class HomeComponent implements OnInit {
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
 
   authService = inject(AuthService);
@@ -22,6 +23,33 @@ export class HomeComponent {
   user = this.authService.getUser();
   sidebarOpen = signal(false);
   uploading = signal(false);
+  recentFiles = signal<FileItemResponse[]>([]);
+  totalFiles = signal(0);
+  totalFolders = signal(0);
+  loading = signal(true);
+
+  ngOnInit(): void {
+    this.loadRecentFiles();
+  }
+
+  loadRecentFiles(): void {
+    this.loading.set(true);
+    this.fileService.listAllFiles().subscribe({
+      next: (files) => {
+        const sorted = files.sort((a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
+        this.recentFiles.set(sorted.slice(0, 10));
+        this.totalFiles.set(files.length);
+        const folders = new Set(files.filter(f => f.folderName).map(f => f.folderName));
+        this.totalFolders.set(folders.size);
+        this.loading.set(false);
+      },
+      error: () => {
+        this.loading.set(false);
+      }
+    });
+  }
 
   toggleSidebar(): void {
     this.sidebarOpen.update(v => !v);

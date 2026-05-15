@@ -103,17 +103,35 @@
         </a>
 
         @if (myDriveExpanded()) {
-        <div class="ml-6 mt-1">
-          @for (folder of folders; track folder.folder_name) {
-          <a 
-            [routerLink]="['/folder', folder.folder_name]"
-            class="flex items-center gap-2 px-2.5 py-1.5 rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-50 transition-colors text-xs"
-          >
-            <svg class="w-3.5 h-3.5 shrink-0 text-yellow-500" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M10 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/>
-            </svg>
-            <span class="truncate">{{ folder.folder_name }}</span>
-          </a>
+        <div class="ml-3 mt-1 space-y-0.5">
+          @for (item of flatFolders(); track item.fullPath) {
+          <div class="flex items-center gap-0.5">
+            <button
+              (click)="toggleFolderNode(item.node)"
+              class="w-4 h-4 flex items-center justify-center shrink-0"
+            >
+              @if (item.hasChildren) {
+              <svg 
+                class="w-2.5 h-2.5 text-gray-400 transition-transform duration-200"
+                [class.rotate-90]="item.expanded"
+                fill="none" stroke="currentColor" viewBox="0 0 24 24"
+              >
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+              </svg>
+              }
+            </button>
+            <a
+              [routerLink]="['/folder', item.fullPath]"
+              (click)="onNavClick()"
+              class="flex items-center gap-1.5 px-1.5 py-1 rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-50 transition-colors text-xs flex-1 min-w-0"
+              [style.paddingLeft.px]="4 + item.depth * 12"
+            >
+              <svg class="w-3.5 h-3.5 shrink-0 text-yellow-500" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M10 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/>
+              </svg>
+              <span class="truncate">{{ item.name }}</span>
+            </a>
+          </div>
           }
         </div>
         }
