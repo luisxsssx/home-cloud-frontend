@@ -27,6 +27,9 @@ export class TrashComponent implements OnInit {
   uploading = signal(false);
 
   ngOnInit(): void {
+    if (!this.fileService.bucketInfoLoaded()) {
+      this.fileService.loadBucketInfo().subscribe();
+    }
   }
 
   toggleSidebar(): void {

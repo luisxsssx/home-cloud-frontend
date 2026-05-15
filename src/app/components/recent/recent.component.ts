@@ -27,6 +27,9 @@ export class RecentComponent implements OnInit {
   uploading = signal(false);
 
   ngOnInit(): void {
+    if (!this.fileService.bucketInfoLoaded()) {
+      this.fileService.loadBucketInfo().subscribe();
+    }
   }
 
   toggleSidebar(): void {

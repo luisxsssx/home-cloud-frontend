@@ -43,6 +43,9 @@ export class SidebarComponent implements OnInit {
   ];
 
   ngOnInit(): void {
+    if (!this.fileService.bucketInfoLoaded()) {
+      this.fileService.loadBucketInfo().subscribe();
+    }
     this.loadFolders();
   }
 

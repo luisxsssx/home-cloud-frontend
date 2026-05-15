@@ -31,14 +31,8 @@ export class AuthService {
     );
   }
 
-  register(data: RegisterRequest): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${environment.apiUrl}/auth/register`, data).pipe(
-      tap(response => {
-        this.storeToken(response.token);
-        this.storeUser(response);
-        this.isAuthenticated.set(true);
-      })
-    );
+  register(data: RegisterRequest): Observable<any> {
+    return this.http.post<any>(`${environment.apiUrl}/auth/register`, data);
   }
 
   logout(): void {
@@ -102,6 +96,39 @@ export class AuthService {
     if (user) {
       const updatedUser = { ...user, ...data };
       localStorage.setItem(this.USER_KEY, JSON.stringify(updatedUser));
+    }
+  }
+
+  updateAccountOnBackend(data: { username?: string; email?: string }): Observable<any> {
+    return this.http.post<any>(`${environment.apiUrl}/cloud/auth/user/update`, data);
+  }
+
+  changePassword(oldPassword: string, newPassword: string): Observable<any> {
+    return this.http.post<any>(`${environment.apiUrl}/cloud/auth/user/change-password`, {
+      oldPassword,
+      newPassword
+    });
+  }
+
+  getAccountId(): number | null {
+    const token = this.getToken();
+    if (!token) return null;
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      return payload.account_id || null;
+    } catch {
+      return null;
+    }
+  }
+
+  getBucketId(): number | null {
+    const token = this.getToken();
+    if (!token) return null;
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      return payload.bucket_id || null;
+    } catch {
+      return null;
     }
   }
 }

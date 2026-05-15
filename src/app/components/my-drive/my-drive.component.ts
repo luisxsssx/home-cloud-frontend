@@ -42,6 +42,9 @@ export class MyDriveComponent implements OnInit {
   pendingDeleteFile = signal<string | null>(null);
 
   ngOnInit(): void {
+    if (!this.fileService.bucketInfoLoaded()) {
+      this.fileService.loadBucketInfo().subscribe();
+    }
     this.route.paramMap.subscribe(params => {
       const folderName = params.get('folderName');
       this.currentFolder.set(folderName ? decodeURIComponent(folderName) : null);

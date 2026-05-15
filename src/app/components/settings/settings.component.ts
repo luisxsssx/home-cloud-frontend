@@ -68,11 +68,19 @@ export class SettingsComponent {
     }
 
     this.savingProfile.set(true);
-    this.authService.updateUser({ username, email });
-    this.user = this.authService.getUser();
-    this.editProfile.set(false);
-    this.savingProfile.set(false);
-    this.notificationService.success('Profile updated successfully');
+    this.authService.updateAccountOnBackend({ username, email }).subscribe({
+      next: () => {
+        this.authService.updateUser({ username, email });
+        this.user = this.authService.getUser();
+        this.editProfile.set(false);
+        this.savingProfile.set(false);
+        this.notificationService.success('Profile updated successfully');
+      },
+      error: () => {
+        this.savingProfile.set(false);
+        this.notificationService.error('Failed to update profile');
+      }
+    });
   }
 
   changePassword(): void {
@@ -85,8 +93,8 @@ export class SettingsComponent {
       return;
     }
 
-    if (newPass.length < 6) {
-      this.notificationService.error('Password must be at least 6 characters');
+    if (newPass.length < 8) {
+      this.notificationService.error('Password must be at least 8 characters');
       return;
     }
 
@@ -96,12 +104,21 @@ export class SettingsComponent {
     }
 
     this.savingPassword.set(true);
-    this.notificationService.success('Password changed successfully');
-    this.currentPassword.set('');
-    this.newPassword.set('');
-    this.confirmPassword.set('');
-    this.showPassword.set(false);
-    this.savingPassword.set(false);
+    this.authService.changePassword(current, newPass).subscribe({
+      next: () => {
+        this.notificationService.success('Password changed successfully');
+        this.currentPassword.set('');
+        this.newPassword.set('');
+        this.confirmPassword.set('');
+        this.showPassword.set(false);
+        this.savingPassword.set(false);
+      },
+      error: (err) => {
+        this.savingPassword.set(false);
+        const message = err.error?.message || 'Failed to change password';
+        this.notificationService.error(message);
+      }
+    });
   }
 
   cancelPasswordChange(): void {
